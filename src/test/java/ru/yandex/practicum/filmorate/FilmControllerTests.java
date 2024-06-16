@@ -26,17 +26,17 @@ public class FilmControllerTests {
     }
 
     @Test
-    public void shouldAddFilm(){
+    public void shouldAddFilm() {
         filmController.createFilm(film);
 
-        assertEquals(List.of(film),filmController.getAllFilms());
+        assertEquals(List.of(film), filmController.getAllFilms());
     }
 
     @Test
     public void shouldNotAddFilmWithEmptyName() {
         film.setName("");
 
-        assertThrows(ValidationException.class,() -> filmController.createFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class FilmControllerTests {
 
     @Test
     public void shouldNotAddFilmWithTooEarliestDate() {
-        LocalDate date = LocalDate.of(1895,12,27);
+        LocalDate date = LocalDate.of(1895, 12, 27);
         film.setReleaseDate(date);
 
         assertThrows(ValidationException.class, () -> filmController.createFilm(film));
@@ -79,7 +79,7 @@ public class FilmControllerTests {
     public void shouldNotAddEmptyFilm() {
         Film f1 = new Film();
 
-        assertThrows(NullPointerException.class, ()-> filmController.createFilm(f1));
+        assertThrows(NullPointerException.class, () -> filmController.createFilm(f1));
     }
 
     @Test
