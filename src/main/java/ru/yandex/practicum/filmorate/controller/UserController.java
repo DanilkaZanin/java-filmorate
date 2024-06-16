@@ -21,7 +21,7 @@ public class UserController {
     public User createUser(@RequestBody final User user) {
         user.setId(getNextId());
         if (checkEmail(user.getEmail()) && checkLogin(user.getLogin()) && checkBirthday(user.getBirthday())) {
-            if (user.getName().trim().isEmpty()) {
+            if (user.getName() == null || user.getName().trim().isEmpty()) {
                 user.setName(user.getLogin());
             }
 
@@ -39,7 +39,7 @@ public class UserController {
     public User updateUser(@RequestBody final User user) {
         if (users.containsKey(user.getId())) {
             if (checkEmail(user.getEmail()) && checkLogin(user.getLogin()) && checkBirthday(user.getBirthday())) {
-                if (user.getName().trim().isEmpty()) {
+                if (user.getName() == null || user.getName().trim().isEmpty()) {
                     user.setName(user.getLogin());
                 }
 
