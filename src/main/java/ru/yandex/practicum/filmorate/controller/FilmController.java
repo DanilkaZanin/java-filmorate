@@ -15,12 +15,6 @@ public class FilmController {
     private final HashMap<Long, Film> films = new HashMap<>();
     private static final LocalDate EARLIEST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
-    /*
-    название не может быть пустым;
-    максимальная длина описания — 200 символов;
-    дата релиза — не раньше 28 декабря 1895 года;
-    продолжительность фильма должна быть положительным числом. */
-
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
         film.setId(getNextId());
@@ -28,7 +22,7 @@ public class FilmController {
                 && checkDuration(film.getDuration()) && checkFilmName(film.getName())) {
             films.put(film.getId(), film);
 
-            log.info("Film crated {}", film);
+            log.info("Film creation failed: {}", film);
             return film;
         } else {
             log.info("Film validation exception");
@@ -44,14 +38,14 @@ public class FilmController {
                     && checkDuration(film.getDuration()) && checkFilmName(film.getName())) {
                 films.put(film.getId(), film);
 
-                log.info("Film updated {}", film);
+                log.info("Film updating failed: {}", film);
                 return film;
             } else {
                 log.info("Film validation exception");
                 throw new ValidationException("Проверьте корректность полей!");
             }
         } else {
-            log.info("Не удалось найти фильм");
+            log.info("Film update failed with noSuchElementException: {}", film);
             throw new NoSuchElementException("Не удалось найти фильм!");
         }
     }
@@ -79,11 +73,7 @@ public class FilmController {
     }
 
     private long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
+        long currentMaxId = films.keySet().stream().mapToLong(id -> id).max().orElse(0);
         return ++currentMaxId;
     }
 }

@@ -11,24 +11,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-// пока не понятно как приложение должно реагировать на пустые значения!
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
     private final HashMap<Long, User> users = new HashMap<>();
 
-    /* электронная почта не может быть пустой и должна содержать символ @;
-        логин не может быть пустым и содержать пробелы;
-        имя для отображения может быть пустым — в таком случае будет использован логин;
-        дата рождения не может быть в будущем.
-        */
-
     @PostMapping
     public User createUser(@RequestBody final User user) {
         user.setId(getNextId());
         if (checkEmail(user.getEmail()) && checkLogin(user.getLogin()) && checkBirthday(user.getBirthday())) {
-            if (user.getName() == null) {
+            if (user.getName().trim().isEmpty()) {
                 user.setName(user.getLogin());
             }
 
@@ -46,7 +39,7 @@ public class UserController {
     public User updateUser(@RequestBody final User user) {
         if (users.containsKey(user.getId())) {
             if (checkEmail(user.getEmail()) && checkLogin(user.getLogin()) && checkBirthday(user.getBirthday())) {
-                if (user.getName() == null) {
+                if (user.getName().trim().isEmpty()) {
                     user.setName(user.getLogin());
                 }
 
@@ -85,7 +78,7 @@ public class UserController {
      * @return true если пробелов нет, false если он есть
      */
     private boolean checkLogin(String login) {
-        return !login.contains(" ");
+        return !login.isEmpty() && !login.contains(" ");
     }
 
     /**
