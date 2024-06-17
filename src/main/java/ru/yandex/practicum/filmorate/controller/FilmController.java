@@ -17,9 +17,9 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@RequestBody Film film) {
-        film.setId(getNextId());
         if (checkDescriptionLength(film.getDescription()) && checkReleaseDate(film.getReleaseDate())
                 && checkDuration(film.getDuration()) && checkFilmName(film.getName())) {
+            film.setId(getNextId());
             films.put(film.getId(), film);
 
             log.info("Film creation failed: {}", film);

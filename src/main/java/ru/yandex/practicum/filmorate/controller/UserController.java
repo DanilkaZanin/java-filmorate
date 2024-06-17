@@ -19,12 +19,11 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody final User user) {
-        user.setId(getNextId());
         if (checkEmail(user.getEmail()) && checkLogin(user.getLogin()) && checkBirthday(user.getBirthday())) {
             if (user.getName() == null || user.getName().trim().isEmpty()) {
                 user.setName(user.getLogin());
             }
-
+            user.setId(getNextId());
             users.put(user.getId(), user);
 
             log.info("User created: {}", user);
