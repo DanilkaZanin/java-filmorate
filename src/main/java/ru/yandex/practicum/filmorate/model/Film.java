@@ -14,11 +14,11 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 public class Film {
-    long id;
+    private long id;
     @NonNull
-    String name;
-    String description;
+    private String name;
+    private String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    LocalDate releaseDate;
-    int duration;
+    private LocalDate releaseDate;
+    private int duration;
 }
