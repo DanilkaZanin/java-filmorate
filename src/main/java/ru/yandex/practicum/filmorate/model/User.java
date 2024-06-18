@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Past;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.yandex.practicum.filmorate.validation.annotation.NoSpaceInLogin;
 
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ public class User {
 
     @NotNull
     @NotBlank
+    @NoSpaceInLogin
     private String login;
 
     @NotNull
