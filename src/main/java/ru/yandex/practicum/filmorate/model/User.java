@@ -2,38 +2,36 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Past;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.validation.annotation.ReleaseDate;
+import ru.yandex.practicum.filmorate.validation.annotation.NoSpaceInLogin;
+
 
 import java.time.LocalDate;
 
-/**
- * Film.
- */
 @Data
 @NoArgsConstructor
-public class Film {
+public class User {
     private long id;
 
     @NotNull
     @NotBlank
+    @NoSpaceInLogin
+    private String login;
+
+    @NotNull
+    @NotBlank
+    @Email
+    private String email;
+
     private String name;
 
-    @Size(min = 1, max = 200)
-    private String description;
-
-
+    @Past
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @ReleaseDate(earliestDate = "1895-12-28")
-    @NotNull
-    private LocalDate releaseDate;
-
-    @Min(1)
-    private int duration;
+    private LocalDate birthday;
 }
