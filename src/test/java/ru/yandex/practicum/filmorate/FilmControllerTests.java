@@ -1,20 +1,31 @@
 package ru.yandex.practicum.filmorate;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 public class FilmControllerTests {
-    private final FilmController filmController = new FilmController();
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     private Film film;
+    private Set<ConstraintViolation<Film>> violations;
+
+    @Autowired
+    FilmController filmController;
 
     @BeforeEach
     void setUp() {
@@ -27,16 +38,17 @@ public class FilmControllerTests {
 
     @Test
     public void shouldAddFilm() {
-        filmController.createFilm(film);
+         this.violations = validator.validate(film);
 
-        assertEquals(List.of(film), filmController.getAllFilms());
+        assertTrue(violations.isEmpty());
     }
 
     @Test
     public void shouldNotAddFilmWithEmptyName() {
-        film.setName("");
+        film.setName(null);
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        this.violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
@@ -45,9 +57,10 @@ public class FilmControllerTests {
                 "The core.convert package provides a general type conversion system. " +
                 "The system defines an SPI to implement type conversion logic and an " +
                 "API to perform type conversions at runtim";
-        film.setDescription(description);
 
-        assertDoesNotThrow(() -> filmController.createFilm(film));
+        film.setDescription(description);
+        this.violations = validator.validate(film);
+        assertTrue(violations.isEmpty());
     }
 
     @Test
@@ -58,7 +71,8 @@ public class FilmControllerTests {
                 "API to perform type conversions at runtime";
         film.setDescription(description);
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        this.violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
@@ -66,20 +80,23 @@ public class FilmControllerTests {
         LocalDate date = LocalDate.of(1895, 12, 27);
         film.setReleaseDate(date);
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        this.violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void shouldNotAddFilmWithNegativeDuration() {
         film.setDuration(-1);
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+
+        this.violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void shouldNotAddEmptyFilm() {
         Film f1 = new Film();
 
-        assertThrows(NullPointerException.class, () -> filmController.createFilm(f1));
+        assertThrows(ValidationException.class, () -> this.violations = validator.validate(f1));
     }
 
     @Test

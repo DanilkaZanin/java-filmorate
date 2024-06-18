@@ -1,19 +1,30 @@
 package ru.yandex.practicum.filmorate;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 public class UserControllerTests {
-    private final UserController userController = new UserController();
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     private User user;
+    private Set<ConstraintViolation<User>> violations;
+
+    @Autowired
+    private UserController userController;
+
 
     @BeforeEach
     public void setUp() {
@@ -26,32 +37,41 @@ public class UserControllerTests {
 
     @Test
     public void shouldAddUser() {
-        userController.createUser(user);
-        assertEquals(List.of(user), userController.getUsers());
+        this.violations = validator.validate(user);
+
+        assertTrue(violations.isEmpty());
     }
 
     @Test
     public void shouldNotAddUserWithoutSymbolAt() {
         user.setEmail("user.ru");
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+
+        this.violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void shouldNotAddUserWithEmptyEmail() {
         user.setEmail("");
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+
+        this.violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    public void shouldNotAddUserWithSpace() {
+    public void shouldNotAddUserWithSpaceInLogin() {
         user.setLogin("user u");
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+
+        this.violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void shouldNotAddUserWithEmptyLogin() {
         user.setLogin("");
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+
+        this.violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
@@ -65,7 +85,9 @@ public class UserControllerTests {
     @Test
     public void shouldNotAddUserWithBirthdayInFuture() {
         user.setBirthday(LocalDate.of(3025, 1, 1));
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+
+        this.violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
     }
 
 
