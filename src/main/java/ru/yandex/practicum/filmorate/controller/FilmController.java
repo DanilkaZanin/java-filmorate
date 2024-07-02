@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import java.util.*;
 
@@ -11,13 +12,12 @@ import java.util.*;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private final HashMap<Long, Film> films = new HashMap<>();
-    //private static final LocalDate EARLIEST_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private final InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         film.setId(getNextId());
-        films.put(film.getId(), film);
+        filmStorage.add(film);
 
         log.info("Film created: {}", film);
         return film;
@@ -25,8 +25,8 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
+        if (filmStorage.existsFilm(film)) {
+            filmStorage.update(film);
 
             log.info("Film updated: {}", film);
             return film;
@@ -40,11 +40,11 @@ public class FilmController {
     @GetMapping
     public List<Film> getAllFilms() {
         log.info("Films list was got");
-        return new ArrayList<>(films.values());
+        return new ArrayList<>(filmStorage.getFilms());
     }
 
     private long getNextId() {
-        long currentMaxId = films.keySet().stream().mapToLong(id -> id).max().orElse(0);
+        long currentMaxId = filmStorage.getKeys().stream().mapToLong(id -> id).max().orElse(0);
         return ++currentMaxId;
     }
 }

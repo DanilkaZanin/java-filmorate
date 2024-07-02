@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.NoSuchElementException;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final HashMap<Long, User> users = new HashMap<>();
+    private InMemoryUserStorage userStorage = new InMemoryUserStorage();
 
     @PostMapping
     public User createUser(@Valid @RequestBody final User user) {
@@ -23,7 +24,7 @@ public class UserController {
         }
 
         user.setId(getNextId());
-        users.put(user.getId(), user);
+        userStorage.add(user);
 
         log.info("User created: {}", user);
         return user;
@@ -31,12 +32,12 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@Valid @RequestBody final User user) {
-        if (users.containsKey(user.getId())) {
+        if (userStorage.exists(user)) {
             if (user.getName() == null || user.getName().trim().isEmpty()) {
                 user.setName(user.getLogin());
             }
 
-            users.put(user.getId(), user);
+            userStorage.update(user);
             log.info("User updated: {}", user.getId());
             return user;
         } else {
@@ -48,11 +49,11 @@ public class UserController {
     @GetMapping
     public List<User> getUsers() {
         log.info("Users list was got");
-        return new ArrayList<>(users.values());
+        return new ArrayList<>(userStorage.getUsers());
     }
 
     private long getNextId() {
-        long currentMaxId = users.keySet()
+        long currentMaxId = userStorage.getUserIds()
                 .stream()
                 .mapToLong(id -> id)
                 .max()
