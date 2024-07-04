@@ -37,9 +37,7 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public Film like(@PathVariable int id, @PathVariable int userId) {
-        if (!userService.containsUser(userId)) {
-            throw new NotFoundException("User with id: " + userId + "not found");
-        }
+        userService.doesUserExist(userId);
         return filmService.setLike(id, userId);
     }
 
