@@ -56,7 +56,8 @@ public class UserService {
 
         if (userStorage.get(userId).getFriends().contains(friendId)) {
             log.info("Users {} {} are already friends", userId, friendId);
-            throw new IsAlreadyFriendException("Humans with id " + userId + " and " + friendId + " are already friends!");
+            throw new IsAlreadyFriendException
+                    ("Humans with id " + userId + " and " + friendId + " are already friends!");
         }
 
         userStorage.get(friendId).putFriend(userId);
@@ -73,7 +74,7 @@ public class UserService {
         userStorage.get(userId).deleteFriend(friendId);
         userStorage.get(friendId).deleteFriend(userId);
 
-        log.info("Users {} {} are not friends now" , userId, friendId);
+        log.info("Users {} {} are not friends now", userId, friendId);
         return userStorage.get(userId);
     }
 
