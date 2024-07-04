@@ -56,8 +56,8 @@ public class UserService {
 
         if (userStorage.get(userId).getFriends().contains(friendId)) {
             log.info("Users {} {} are already friends", userId, friendId);
-            throw new IsAlreadyFriendException
-                    ("Humans with id " + userId + " and " + friendId + " are already friends!");
+            throw new IsAlreadyFriendException(
+                    "Humans with id " + userId + " and " + friendId + " are already friends!");
         }
 
         userStorage.get(friendId).putFriend(userId);
