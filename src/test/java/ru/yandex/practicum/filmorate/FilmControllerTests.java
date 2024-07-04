@@ -9,10 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -109,6 +109,6 @@ public class FilmControllerTests {
 
     @Test
     public void shouldNotUpdateNonExistentFilm() {
-        assertThrows(NoSuchElementException.class, () -> filmController.updateFilm(film));
+        assertThrows(NotFoundException.class, () -> filmController.updateFilm(film));
     }
 }
