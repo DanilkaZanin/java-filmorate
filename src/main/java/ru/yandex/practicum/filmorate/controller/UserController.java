@@ -1,63 +1,53 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 @Slf4j
 public class UserController {
-    private InMemoryUserStorage userStorage = new InMemoryUserStorage();
+    private final UserService userService;
 
     @PostMapping
     public User createUser(@Valid @RequestBody final User user) {
-        if (user.getName() == null || user.getName().trim().isEmpty()) {
-            user.setName(user.getLogin());
-        }
-
-        user.setId(getNextId());
-        userStorage.add(user);
-
-        log.info("User created: {}", user);
-        return user;
+        return userService.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody final User user) {
-        if (userStorage.exists(user)) {
-            if (user.getName() == null || user.getName().trim().isEmpty()) {
-                user.setName(user.getLogin());
-            }
-
-            userStorage.update(user);
-            log.info("User updated: {}", user.getId());
-            return user;
-        } else {
-            log.info("User update failed with noSuchElementException: {}", user);
-            throw new NoSuchElementException("Такого пользователя нет!");
-        }
+        return userService.updateUser(user);
     }
 
     @GetMapping
     public List<User> getUsers() {
-        log.info("Users list was got");
-        return new ArrayList<>(userStorage.getUsers());
+        return userService.getUsers();
     }
 
-    private long getNextId() {
-        long currentMaxId = userStorage.getUserIds()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+    @PutMapping("/{id}/friends/{friendId}")
+    public User setFriend(@PathVariable final Long id, @PathVariable final Long friendId) {
+        return userService.setFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User deleteFriend(@PathVariable final Long id, @PathVariable final Long friendId) {
+        return userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable final Long id) {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable final Long id, @PathVariable final Long otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 }
