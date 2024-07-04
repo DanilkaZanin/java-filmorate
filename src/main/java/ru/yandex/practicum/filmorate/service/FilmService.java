@@ -45,18 +45,17 @@ public class FilmService {
     }
 
     public Film setLike(long filmId, long userId) {
-        if (!filmStorage.contains(filmId)) {
-            throw new NotFoundException("Film with id : " + filmId + "not found");
-        }
+        doesFilmExist(filmId);
+
         Film film = filmStorage.getFilm(filmId);
         film.putLike(userId);
+
+        log.info("Film was liked");
         return film;
     }
 
     public Film removeLike(long filmId, long userId) {
-        if (!filmStorage.contains(filmId)) {
-            throw new NotFoundException("Film with id : " + filmId + "not found");
-        }
+        doesFilmExist(filmId);
 
         Film film = filmStorage.getFilm(filmId);
 
@@ -65,14 +64,24 @@ public class FilmService {
         }
 
         film.deleteLike(userId);
+
+        log.info("Like was deleted");
         return film;
     }
 
     public List<Film> getPopularFilms(int count) {
+        log.info("Ф list of popular films of " + count + " is displayed");
         return filmStorage.getFilms().stream()
                 .sorted(Comparator.comparing((Film film) -> film.getLikes().size()).reversed())
                 .limit(count)
                 .toList();
+    }
+
+    public void doesFilmExist(long id) {
+        if (!filmStorage.contains(id)) {
+            log.info("Film with id: {} doesn't exist!", id);
+            throw new NotFoundException("Film with id : " + id + "not found");
+        }
     }
 
     private long getNextId() {
