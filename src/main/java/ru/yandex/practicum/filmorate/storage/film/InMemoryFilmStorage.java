@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@Component
+@Component("InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films;
 
@@ -31,14 +31,22 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.put(film.getId(), film);
     }
 
+    @Override
+    public Film getFilm(long id) {
+        return films.get(id);
+    }
+
+    @Override
     public Collection<Film> getFilms() {
         return films.values();
     }
 
-    public boolean existsFilm(Film film) {
-        return films.containsKey(film.getId());
+    @Override
+    public boolean contains(long id) {
+        return films.containsKey(id);
     }
 
+    @Override
     public Set<Long> getKeys() {
         return films.keySet();
     }

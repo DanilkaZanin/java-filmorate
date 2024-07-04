@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 @Component
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private final HashMap<Long, User> users;
 
     public InMemoryUserStorage() {
@@ -30,14 +30,27 @@ public class InMemoryUserStorage implements UserStorage{
         users.remove(user.getId());
     }
 
+    @Override
     public boolean exists(User user) {
         return users.containsKey(user.getId());
     }
 
+    @Override
+    public boolean exists(long userId) {
+        return users.containsKey(userId);
+    }
+
+    @Override
+    public User get(long userId) {
+        return users.get(userId);
+    }
+
+    @Override
     public Collection<User> getUsers() {
         return users.values();
     }
 
+    @Override
     public Set<Long> getUserIds() {
         return users.keySet();
     }
