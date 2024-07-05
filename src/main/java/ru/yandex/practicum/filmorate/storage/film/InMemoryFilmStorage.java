@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@Component("InMemoryFilmStorage")
+@Component
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films;
 
