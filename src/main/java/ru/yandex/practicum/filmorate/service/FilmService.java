@@ -70,14 +70,14 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilms(int count) {
-        log.info("Ф list of popular films of " + count + " is displayed");
+        log.info("List of popular films of " + count + " is displayed");
         return filmStorage.getFilms().stream()
                 .sorted(Comparator.comparing((Film film) -> film.getLikes().size()).reversed())
                 .limit(count)
                 .toList();
     }
 
-    public void doesFilmExist(long id) {
+    private void doesFilmExist(long id) {
         if (!filmStorage.contains(id)) {
             log.info("Film with id: {} doesn't exist!", id);
             throw new NotFoundException("Film with id : " + id + "not found");
