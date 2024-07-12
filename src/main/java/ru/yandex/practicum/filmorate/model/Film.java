@@ -39,6 +39,11 @@ public class Film {
 
     private Set<Long> likes = new HashSet<>();
 
+    private Set<String> genre = new HashSet<>();
+
+    private String rating;
+
+
     public void putLike(long id) {
         likes.add(id);
     }
