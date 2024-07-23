@@ -5,12 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.IsAlreadyFriendException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.FriendStatus;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,14 +57,13 @@ public class UserService {
         doesUserExist(userId);
         doesUserExist(friendId);
 
-        if (userStorage.get(userId).getFriends().contains(friendId)) {
+        if (userStorage.get(userId).getFriends().containsKey(friendId)) {
             log.info("Users {} {} are already friends", userId, friendId);
             throw new IsAlreadyFriendException(
                     "Humans with id " + userId + " and " + friendId + " are already friends!");
         }
 
-        userStorage.get(friendId).putFriend(userId);
-        userStorage.get(userId).putFriend(friendId);
+        userStorage.get(userId).putFriend(friendId, FriendStatus.UNCONFIRMED);
 
         log.info("Users {} {} are friends now!", userId, friendId);
         return userStorage.get(userId);
@@ -81,7 +83,7 @@ public class UserService {
     public List<User> getFriends(final long userId) {
         doesUserExist(userId);
 
-        Set<Long> friends = userStorage.get(userId).getFriends();
+        Set<Long> friends = userStorage.get(userId).getFriends().keySet();
 
         log.info("Friends list received");
         return userStorage.getUsers().stream().filter(user -> friends.contains(user.getId())).toList();
@@ -91,10 +93,19 @@ public class UserService {
         doesUserExist(userId);
         doesUserExist(friendId);
 
-        Set<Long> f = userStorage.get(friendId).getFriends();
+        //Теперь я получаю список id только подтвержденных друзей
+        Set<Long> f = userStorage.get(friendId).getFriends().entrySet()
+                .stream()
+                .filter(friend -> friend.getValue().equals(FriendStatus.CONFIRMED))
+                .map(Map.Entry::getKey).collect(Collectors.toSet());
 
         log.info("Common friends list received");
-        return userStorage.get(userId).getFriends().stream().filter(f::contains).map(userStorage::get).toList();
+        return userStorage.get(userId).getFriends().entrySet()
+                .stream()
+                .filter(friend -> friend.getValue().equals(FriendStatus.CONFIRMED))
+                .map(Map.Entry::getKey)
+                .filter(f::contains)
+                .map(userStorage::get).toList();
     }
 
     public void doesUserExist(long id) {
