@@ -169,9 +169,4 @@ public class UserRepository implements UserStorage {
         MapSqlParameterSource params = new MapSqlParameterSource("friend_id", id);
         return jdbcTemplate.query(GET_USERS_FRIENDS, params, new UserRowMapper());
     }
-
-    @Override
-    public Set<Long> getUserIds() {
-        return Set.of();
-    }
 }
