@@ -11,9 +11,7 @@ import ru.yandex.practicum.filmorate.validation.annotation.NoSpaceInLogin;
 
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -37,12 +35,4 @@ public class User {
     private LocalDate birthday;
 
     private Map<Long, FriendStatus> friends = new HashMap();
-
-    public void putFriend(long friendId, FriendStatus status) {
-        friends.put(friendId,status);
-    }
-
-    public void deleteFriend(long friendId) {
-        friends.remove(friendId);
-    }
 }
