@@ -3,17 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.IsAlreadyFriendException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.FriendStatus;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,30 +17,33 @@ public class UserService {
     private final UserStorage userStorage;
 
     public User createUser(final User user) {
+        if (userStorage.get(user.getId()).isPresent()) {
+            log.info("User creation failed {}", user.getId());
+            throw new NotFoundException("User with id " + user.getId() + " already exists");
+        }
+        if (user.getName() == null || user.getName().trim().isEmpty()) {
+            user.setName(user.getLogin());
+        }
+        User user1 = userStorage.add(user);
+
+        log.info("User created: {}", user);
+        return user1;
+    }
+
+    public User updateUser(final User user) {
+        if (userStorage.get(user.getId()).isEmpty()) {
+            log.info("User update failed with noSuchElementException: {}", user);
+            throw new NotFoundException("Такого пользователя нет!");
+        }
+
         if (user.getName() == null || user.getName().trim().isEmpty()) {
             user.setName(user.getLogin());
         }
 
-        user.setId(getNextId());
-        userStorage.add(user);
-
-        log.info("User created: {}", user);
+        userStorage.update(user);
+        log.info("User {} updated", user);
         return user;
-    }
 
-    public User updateUser(final User user) {
-        if (userStorage.exists(user)) {
-            if (user.getName() == null || user.getName().trim().isEmpty()) {
-                user.setName(user.getLogin());
-            }
-
-            userStorage.update(user);
-            log.info("User updated: {}", user.getId());
-            return user;
-        } else {
-            log.info("User update failed with noSuchElementException: {}", user);
-            throw new NotFoundException("Такого пользователя нет!");
-        }
     }
 
     public List<User> getUsers() {
@@ -54,74 +52,48 @@ public class UserService {
     }
 
     public User setFriend(final long userId, final long friendId) {
-        doesUserExist(userId);
-        doesUserExist(friendId);
-
-        if (userStorage.get(userId).getFriends().containsKey(friendId)) {
-            log.info("Users {} {} are already friends", userId, friendId);
-            throw new IsAlreadyFriendException(
-                    "Humans with id " + userId + " and " + friendId + " are already friends!");
+        if (userStorage.get(userId).isEmpty()) {
+            throw new NotFoundException("User with id " + userId + " does not exist");
+        }
+        if (userStorage.get(friendId).isEmpty()) {
+            throw new NotFoundException("Friend with id " + friendId + " does not exist");
         }
 
-        userStorage.get(userId).putFriend(friendId, FriendStatus.UNCONFIRMED);
-
         log.info("Users {} {} are friends now!", userId, friendId);
-        return userStorage.get(userId);
+        return userStorage.setFriend(userId, friendId);
     }
 
     public User deleteFriend(final long userId, final long friendId) {
-        doesUserExist(userId);
-        doesUserExist(friendId);
+        if (userStorage.get(userId).isEmpty()) {
+            throw new NotFoundException("User with id " + userId + " does not exist");
+        }
+        if (userStorage.get(friendId).isEmpty()) {
+            throw new NotFoundException("Friend with id " + friendId + " does not exist");
+        }
 
-        userStorage.get(userId).deleteFriend(friendId);
-        userStorage.get(friendId).deleteFriend(userId);
-
+        userStorage.delete(userId, friendId);
         log.info("Users {} {} are not friends now", userId, friendId);
-        return userStorage.get(userId);
+        return userStorage.get(userId).get();
     }
 
     public List<User> getFriends(final long userId) {
-        doesUserExist(userId);
+        if (userStorage.get(userId).isEmpty()) {
+            throw new NotFoundException("User with id " + userId + " does not exist");
+        }
 
-        Set<Long> friends = userStorage.get(userId).getFriends().keySet();
-
-        log.info("Friends list received");
-        return userStorage.getUsers().stream().filter(user -> friends.contains(user.getId())).toList();
+        List<User> friends = userStorage.getFriends(userId);
+        log.info("friend were taken");
+        return friends;
     }
 
     public List<User> getCommonFriends(final long userId, final long friendId) {
-        doesUserExist(userId);
-        doesUserExist(friendId);
-
-        //Теперь я получаю список id только подтвержденных друзей
-        Set<Long> f = userStorage.get(friendId).getFriends().entrySet()
-                .stream()
-                .filter(friend -> friend.getValue().equals(FriendStatus.CONFIRMED))
-                .map(Map.Entry::getKey).collect(Collectors.toSet());
-
-        log.info("Common friends list received");
-        return userStorage.get(userId).getFriends().entrySet()
-                .stream()
-                .filter(friend -> friend.getValue().equals(FriendStatus.CONFIRMED))
-                .map(Map.Entry::getKey)
-                .filter(f::contains)
-                .map(userStorage::get).toList();
-    }
-
-    public void doesUserExist(long id) {
-        if (!userStorage.exists(id)) {
-            log.info("User {} does not exist", id);
-            throw new NotFoundException("User with id " + id + " not found!");
+        if (userStorage.get(userId).isEmpty()) {
+            throw new NotFoundException("User with id " + userId + " does not exist");
         }
-    }
+        if (userStorage.get(friendId).isEmpty()) {
+            throw new NotFoundException("Friend with id " + friendId + " does not exist");
+        }
 
-    private long getNextId() {
-        long currentMaxId = userStorage.getUserIds()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+        return userStorage.getCommonFriends(userId, friendId);
     }
-
 }
