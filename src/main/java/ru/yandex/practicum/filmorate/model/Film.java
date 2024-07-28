@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,8 +11,7 @@ import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.validation.annotation.ReleaseDate;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 /**
  * Film.
@@ -37,18 +37,14 @@ public class Film {
     @Min(1)
     private int duration;
 
-    private Set<Long> likes = new HashSet<>();
+    private LinkedHashSet<Long> likes = new LinkedHashSet<>();
 
-    private Set<String> genre = new HashSet<>();
-
-    private String rating;
-
-
-    public void putLike(long id) {
-        likes.add(id);
-    }
-
-    public void deleteLike(long id) {
-        likes.remove(id);
-    }
+    @NotNull
+    @Valid
+    private Mpa mpa;
+/*
+    @NotNull
+    @Size(min = 1)*/
+    @Valid
+    LinkedHashSet<Genre> genres = new LinkedHashSet<>();
 }
