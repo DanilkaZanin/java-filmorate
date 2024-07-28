@@ -35,11 +35,11 @@ public class FilmRepositoryApplicationTests {
         film.setName("film");
         film.setDescription("description");
         film.setDuration(160);
-        film.setReleaseDate(LocalDate.of(2010,10,10));
-        film.setMpa(new Mpa(1,null));
+        film.setReleaseDate(LocalDate.of(2010, 10, 10));
+        film.setMpa(new Mpa(1, null));
 
         LinkedHashSet<Genre> genres = new LinkedHashSet<>();
-        genres.add(new Genre(1,null));
+        genres.add(new Genre(1, null));
 
         film.setGenres(genres);
     }
@@ -72,14 +72,14 @@ public class FilmRepositoryApplicationTests {
         film1.setName("film1");
         film1.setDescription("description1");
         film1.setDuration(160);
-        film1.setMpa(new Mpa(1,null));
-        film1.setReleaseDate(LocalDate.of(2010,10,10));
+        film1.setMpa(new Mpa(1, null));
+        film1.setReleaseDate(LocalDate.of(2010, 10, 10));
         Film film2 = new Film();
         film2.setName("film2");
         film2.setDescription("description2");
         film2.setDuration(160);
-        film2.setMpa(new Mpa(1,null));
-        film2.setReleaseDate(LocalDate.of(2010,10,10));
+        film2.setMpa(new Mpa(1, null));
+        film2.setReleaseDate(LocalDate.of(2010, 10, 10));
 
         film1 = filmRepository.add(film1);
         film2 = filmRepository.add(film2);

@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.ComponentScan;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.UserRepository;
 import ru.yandex.practicum.filmorate.repository.UserStorage;
 
 import java.time.LocalDate;
@@ -32,7 +31,7 @@ class UserRepositoryApplicationTests {
         user.setLogin("login");
         user.setName("name");
         user.setEmail("email");
-        user.setBirthday(LocalDate.of(2001,1,1));
+        user.setBirthday(LocalDate.of(2001, 1, 1));
 
         userRepository.add(user);
     }
@@ -63,7 +62,7 @@ class UserRepositoryApplicationTests {
         user1.setLogin("login1");
         user1.setName("name1");
         user1.setEmail("email1");
-        user1.setBirthday(LocalDate.of(2001,1,1));
+        user1.setBirthday(LocalDate.of(2001, 1, 1));
         userRepository.add(user1);
 
         List<User> users = userRepository.getUsers();
@@ -76,7 +75,7 @@ class UserRepositoryApplicationTests {
         Optional<User> newUser = userRepository.get(user.getId());
 
         assertThat(newUser).isPresent();
-        assertEquals(user,newUser.get());
+        assertEquals(user, newUser.get());
     }
 
     @Test
@@ -85,7 +84,7 @@ class UserRepositoryApplicationTests {
         user1.setLogin("login2");
         user1.setName("name2");
         user1.setEmail("email2");
-        user1.setBirthday(LocalDate.of(2001,1,1));
+        user1.setBirthday(LocalDate.of(2001, 1, 1));
 
         user1 = userRepository.add(user1);
 
@@ -100,13 +99,13 @@ class UserRepositoryApplicationTests {
         user1.setLogin("login1");
         user1.setName("name1");
         user1.setEmail("email1");
-        user1.setBirthday(LocalDate.of(2001,1,1));
+        user1.setBirthday(LocalDate.of(2001, 1, 1));
 
         User user2 = new User();
         user2.setLogin("login2");
         user2.setName("name2");
         user2.setEmail("email2");
-        user2.setBirthday(LocalDate.of(2001,1,1));
+        user2.setBirthday(LocalDate.of(2001, 1, 1));
 
         user1 = userRepository.add(user1);
         user2 = userRepository.add(user2);
