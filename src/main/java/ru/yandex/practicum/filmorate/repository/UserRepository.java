@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.mapper.FriendsRowMapper;
 import ru.yandex.practicum.filmorate.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.FriendStatus;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -164,7 +163,7 @@ public class UserRepository implements UserStorage {
         return users;
     }
 
-    @Override //почему тут id друга?
+    @Override
     public List<User> getFriends(long id) {
         MapSqlParameterSource params = new MapSqlParameterSource("friend_id", id);
         return jdbcTemplate.query(GET_USERS_FRIENDS, params, new UserRowMapper());
