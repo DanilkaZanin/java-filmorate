@@ -3,90 +3,99 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.IsAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.repository.FilmStorage;
+import ru.yandex.practicum.filmorate.repository.GenreStorage;
+import ru.yandex.practicum.filmorate.repository.MpaStorage;
+import ru.yandex.practicum.filmorate.repository.UserStorage;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
 
-    private final FilmStorage filmStorage;
+    private final FilmStorage filmRepository;
+    private final UserStorage userRepository;
+    private final GenreStorage genreRepository;
+    private final MpaStorage mpaRepository;
 
     public Film createFilm(Film film) {
-        film.setId(getNextId());
-        filmStorage.add(film);
+        if (filmRepository.getFilm(film.getId()).isPresent()) {
+            log.info("Film create failed: {}", film);
+            throw new IsAlreadyExistsException("Film with name " + film.getName() + " already exists");
+        }
+
+        film = filmRepository.add(film);
 
         log.info("Film created: {}", film);
         return film;
     }
 
     public Film updateFilm(Film film) {
-        if (filmStorage.contains(film.getId())) {
-            filmStorage.update(film);
-
-            log.info("Film updated: {}", film);
-            return film;
-
-        } else {
-            log.info("Film update failed with noSuchElementException: {}", film);
-            throw new NotFoundException("Не удалось найти фильм!");
+        if (filmRepository.getFilm(film.getId()).isEmpty()) {
+            log.info("Film update failed: {}", film);
+            throw new NotFoundException("Film with name " + film.getName() + " does not exist yet");
         }
-    }
 
-    public List<Film> getAllFilms() {
-        log.info("Films list was got");
-        return new ArrayList<>(filmStorage.getFilms());
+        film = filmRepository.update(film);
+
+        log.info("Film updated: {}", film);
+        return film;
     }
 
     public Film setLike(long filmId, long userId) {
-        doesFilmExist(filmId);
+        if (filmRepository.getFilm(filmId).isEmpty()) {
+            throw new NotFoundException("Film with id " + filmId + " does not exist yet");
+        }
+        if (userRepository.get(userId).isEmpty()) {
+            throw new NotFoundException("User with id " + userId + " does not exist yet");
+        }
 
-        Film film = filmStorage.getFilm(filmId);
-        film.putLike(userId);
-
+        filmRepository.setLike(filmId, userId);
         log.info("Film was liked");
-        return film;
+        return null;
     }
 
     public Film removeLike(long filmId, long userId) {
-        doesFilmExist(filmId);
-
-        Film film = filmStorage.getFilm(filmId);
-
-        if (!film.getLikes().contains(userId)) {
-            throw new NotFoundException("User with id : " + userId + "not found");
+        if (filmRepository.getFilm(filmId).isEmpty()) {
+            throw new NotFoundException("Film with id " + filmId + " does not exist yet");
+        }
+        if (userRepository.get(userId).isEmpty()) {
+            throw new NotFoundException("User with id " + userId + " does not exist yet");
         }
 
-        film.deleteLike(userId);
-
+        filmRepository.removeLike(filmId, userId);
         log.info("Like was deleted");
-        return film;
+        return null;
+    }
+
+    public Film getFilm(long id) {
+        Optional<Film> film = filmRepository.getFilm(id);
+        if (film.isEmpty()) {
+            throw new NotFoundException("Film with id " + id + " does not exist yet");
+        }
+
+        film.get().setMpa(mpaRepository.getName(film.get().getMpa().getId()).get());
+
+        return film.get();
+    }
+
+    public List<Film> getFilms() {
+        return (List<Film>) filmRepository.getFilms(Optional.empty());
     }
 
     public List<Film> getPopularFilms(int count) {
         log.info("List of popular films of " + count + " is displayed");
-        return filmStorage.getFilms().stream()
-                .sorted(Comparator.comparing((Film film) -> film.getLikes().size()).reversed())
-                .limit(count)
-                .toList();
+        return (List<Film>) filmRepository.getFilms(Optional.of(count));
     }
 
-    private void doesFilmExist(long id) {
-        if (!filmStorage.contains(id)) {
-            log.info("Film with id: {} doesn't exist!", id);
-            throw new NotFoundException("Film with id : " + id + "not found");
-        }
-    }
-
-    private long getNextId() {
-        long currentMaxId = filmStorage.getKeys().stream().mapToLong(id -> id).max().orElse(0);
-        return ++currentMaxId;
+    public void deleteFilm(long id) {
+        filmRepository.delete(id);
     }
 
 }
