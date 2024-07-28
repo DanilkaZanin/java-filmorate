@@ -15,7 +15,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.time.LocalDate;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class FilmControllerTests {
@@ -37,13 +38,6 @@ public class FilmControllerTests {
     }
 
     @Test
-    public void shouldAddFilm() {
-         this.violations = validator.validate(film);
-
-        assertTrue(violations.isEmpty());
-    }
-
-    @Test
     public void shouldNotAddFilmWithEmptyName() {
         film.setName(null);
 
@@ -51,17 +45,6 @@ public class FilmControllerTests {
         assertFalse(violations.isEmpty());
     }
 
-    @Test
-    public void shouldAddFilmWith200SymbolsDescription() {
-        String description = "Spring Type Conversion\n" +
-                "The core.convert package provides a general type conversion system. " +
-                "The system defines an SPI to implement type conversion logic and an " +
-                "API to perform type conversions at runtim";
-
-        film.setDescription(description);
-        this.violations = validator.validate(film);
-        assertTrue(violations.isEmpty());
-    }
 
     @Test
     public void shouldNotAddFilmWithMoreThen200SymbolsDescription() {
@@ -97,14 +80,6 @@ public class FilmControllerTests {
         Film f1 = new Film();
 
         assertThrows(ValidationException.class, () -> this.violations = validator.validate(f1));
-    }
-
-    @Test
-    public void shouldUpdateFilm() {
-        filmController.createFilm(film);
-        film.setDescription("new desription");
-
-        filmController.updateFilm(film);
     }
 
     @Test

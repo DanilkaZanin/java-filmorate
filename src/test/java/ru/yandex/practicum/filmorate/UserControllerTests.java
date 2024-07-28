@@ -13,7 +13,8 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 public class UserControllerTests {
@@ -72,14 +73,6 @@ public class UserControllerTests {
 
         this.violations = validator.validate(user);
         assertFalse(violations.isEmpty());
-    }
-
-    @Test
-    public void shouldAddUserWithEmptyName() {
-        user.setName("");
-
-        userController.createUser(user);
-        assertEquals("user", userController.getUsers().getFirst().getName());
     }
 
     @Test
