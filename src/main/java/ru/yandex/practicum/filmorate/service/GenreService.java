@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.repository.GenreStorage;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,9 @@ public class GenreService {
     }
 
     public List<Genre> getGenres() {
-        return genreRepository.getGenres();
+        return genreRepository.getGenres()
+                .stream()
+                .sorted(Comparator.comparing(Genre::getId))
+                .toList();
     }
 }

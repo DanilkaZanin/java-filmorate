@@ -6,8 +6,10 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.repository.MpaRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,9 @@ public class MpaService {
     }
 
     public List<Mpa> getAll() {
-        return mpaRepository.getAll();
+        return mpaRepository.getAll()
+                .stream()
+                .sorted(Comparator.comparingDouble(Mpa::getId))
+                .toList();
     }
 }
