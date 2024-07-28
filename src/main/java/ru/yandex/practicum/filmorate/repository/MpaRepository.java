@@ -18,6 +18,7 @@ public class MpaRepository implements MpaStorage {
 
     private static final String GET_NAME_QUERY = "SELECT * FROM mpa WHERE id = :id";
     private static final String GET_ALL_QUERY = "SELECT * FROM mpa";
+
     @Override
     public Optional<Mpa> getName(long id) {
         try {

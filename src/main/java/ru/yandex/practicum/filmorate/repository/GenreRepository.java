@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class GenreRepository implements GenreStorage{
+public class GenreRepository implements GenreStorage {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     private static final String SELECT_GENRE_BY_ID = "SELECT * FROM genres WHERE id = :id";

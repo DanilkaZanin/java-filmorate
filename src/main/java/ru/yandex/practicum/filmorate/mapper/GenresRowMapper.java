@@ -19,10 +19,10 @@ public class GenresRowMapper implements RowMapper<Void> {
         Long genreId = rs.getLong("genre_id");
 
         if (genres.containsKey(filmId)) {
-            genres.get(filmId).add(new Genre(genreId,null));
+            genres.get(filmId).add(new Genre(genreId, null));
         } else {
             LinkedHashSet<Genre> set = new LinkedHashSet<>();
-            set.add(new Genre(genreId,null));
+            set.add(new Genre(genreId, null));
             genres.put(filmId, set);
         }
         return null;

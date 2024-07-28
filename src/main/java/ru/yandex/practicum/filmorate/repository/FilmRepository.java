@@ -24,16 +24,17 @@ public class FilmRepository implements FilmStorage {
     private static final String INSERT_FILM_QUERY =
             "INSERT INTO films (film_name, description, release_date, duration, mpa_id) " +
                     "VALUES (:film_name, :description, :release_date, :duration, :mpa_id)";
-                    /*"INSERT INTO mpa(id, name) VALUES (:mpa_id, :name)";*/
     private static final String INSERT_GENRE_QUERY =
-                            "INSERT INTO films_genres (film_id, genre_id) VALUES (:film_id, :genre_id)";
+            "INSERT INTO films_genres (film_id, genre_id) VALUES (:film_id, :genre_id)";
     private static final String INSERT_LIKE_QUERY = "INSERT INTO likes (film_id, user_id) VALUES (:film_id, :user_id)";
     private static final String UPDATE_FILM_QUERY =
             "UPDATE films SET film_name = :film_name, description = :description, release_date = :release_date, " +
                     "duration = :duration, mpa_id = :mpa_id WHERE id = :id";
-    private static final String GET_POPULAR_FILMS_QUERY = "SELECT films.* FROM films LEFT JOIN likes ON films.id = likes.film_id GROUP BY films.id ORDER BY COUNT(likes.film_id) DESC LIMIT :limit";
+    private static final String GET_POPULAR_FILMS_QUERY = "SELECT films.* FROM films LEFT JOIN likes " +
+            "ON films.id = likes.film_id GROUP BY films.id ORDER BY COUNT(likes.film_id) DESC LIMIT :limit";
     private static final String GET_FILM_BY_ID_QUERY = "SELECT * FROM films WHERE id = :id";
-    private static final String GET_GENRES_BU_ID = "SELECT g.id, g.name FROM films_genres fg LEFT JOIN genres g ON fg.genre_id = g.id WHERE film_id = :id";
+    private static final String GET_GENRES_BU_ID =
+            "SELECT g.id, g.name FROM films_genres fg LEFT JOIN genres g ON fg.genre_id = g.id WHERE film_id = :id";
     private static final String GET_GENRES_QUERY = "SELECT * FROM genres";
     private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE film_name = :film_name";
     private static final String DELETE_GENRE_QUERY = "DELETE FROM films_genres WHERE film_id = :film_id";
@@ -52,17 +53,14 @@ public class FilmRepository implements FilmStorage {
         params.addValue("mpa_id", film.getMpa().getId());
         jdbcTemplate.update(INSERT_FILM_QUERY, params, keyHolder, new String[]{"id"});
 
-        film.setId(keyHolder.getKey().longValue()); //ну это работает!
-
+        film.setId(keyHolder.getKey().longValue());
         putGenres(film.getGenres(), film.getId());
-
         return film;
     }
 
-    //тут неправильное имя параметра
     @Override
     public void delete(long id) {
-        SqlParameterSource parameterSource = new MapSqlParameterSource("id", id);
+        SqlParameterSource parameterSource = new MapSqlParameterSource("film_id", id);
         jdbcTemplate.update(DELETE_GENRE_QUERY, parameterSource);
         jdbcTemplate.update(DELETE_FILM_QUERY, parameterSource);
     }
@@ -88,7 +86,7 @@ public class FilmRepository implements FilmStorage {
     }
 
 
-    @Override //нужно по id
+    @Override
     public Optional<Film> getFilm(long id) {
         try {
             SqlParameterSource parameterSource = new MapSqlParameterSource("id", id);
@@ -153,6 +151,6 @@ public class FilmRepository implements FilmStorage {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("film_id", filmId);
         parameterSource.addValue("user_id", userId);
-        jdbcTemplate.update(DELETE_LIKE_QUERY,parameterSource);
+        jdbcTemplate.update(DELETE_LIKE_QUERY, parameterSource);
     }
 }

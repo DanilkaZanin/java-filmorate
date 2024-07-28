@@ -17,13 +17,13 @@ public class MpaService {
     public Mpa getName(long id) {
         Optional<Mpa> mpa = mpaRepository.getName(id);
 
-        if(mpa.isEmpty()) {
+        if (mpa.isEmpty()) {
             throw new NotFoundException("Mpa with id " + id + " not found");
         }
         return mpa.get();
     }
 
-    public List<Mpa> getAll () {
+    public List<Mpa> getAll() {
         return mpaRepository.getAll();
     }
 }

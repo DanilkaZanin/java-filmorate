@@ -42,9 +42,7 @@ public class Film {
     @NotNull
     @Valid
     private Mpa mpa;
-/*
-    @NotNull
-    @Size(min = 1)*/
+
     @Valid
     LinkedHashSet<Genre> genres = new LinkedHashSet<>();
 }
