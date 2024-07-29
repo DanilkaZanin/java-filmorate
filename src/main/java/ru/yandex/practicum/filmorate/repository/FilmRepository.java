@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Primary
@@ -57,6 +58,11 @@ public class FilmRepository implements FilmStorage {
 
         film.setId(keyHolder.getKey().longValue());
         putGenres(film.getGenres(), film.getId());
+        film.setGenres(film.getGenres()
+                .stream()
+                .sorted(Comparator.comparing(Genre::getId))
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
+        // у меня в тесте постмана передается 5,3 вместо 3,5
         return film;
     }
 
