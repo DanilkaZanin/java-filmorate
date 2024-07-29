@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.repository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Primary
 @RequiredArgsConstructor
 @Repository("userRepository")
@@ -113,6 +114,7 @@ public class UserRepository implements UserStorage {
 
             return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException e) {
+            log.info("EmptyResultDataAccessException during query for user: {}", userId);
             return Optional.empty();
         }
 
