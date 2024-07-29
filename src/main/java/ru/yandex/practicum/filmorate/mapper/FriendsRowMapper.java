@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class FriendsRowMapper implements RowMapper<Void> {
+public class FriendsRowMapper implements RowMapper<Map<Long, Map<Long, FriendStatus>>> {
     private final Map<Long, Map<Long, FriendStatus>> friendsMap;
 
     @Override
-    public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public Map<Long, Map<Long, FriendStatus>> mapRow(ResultSet rs, int rowNum) throws SQLException {
         long userId = rs.getLong("user_id");
         long friendId = rs.getLong("friend_id");
         FriendStatus fs = FriendStatus.valueOf(rs.getString("status"));
@@ -27,6 +27,6 @@ public class FriendsRowMapper implements RowMapper<Void> {
             friendsMap.put(userId, m1);
         }
 
-        return null;
+        return friendsMap;
     }
 }

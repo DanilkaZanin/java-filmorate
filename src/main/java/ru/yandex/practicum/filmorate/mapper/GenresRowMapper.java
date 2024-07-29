@@ -10,11 +10,11 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class GenresRowMapper implements RowMapper<Void> {
+public class GenresRowMapper implements RowMapper<Map<Long, LinkedHashSet<Genre>>> {
     private final Map<Long, LinkedHashSet<Genre>> genres;
 
     @Override
-    public Void mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public Map<Long, LinkedHashSet<Genre>> mapRow(ResultSet rs, int rowNum) throws SQLException {
         Long filmId = rs.getLong("film_id");
         Long genreId = rs.getLong("genre_id");
 
@@ -25,6 +25,6 @@ public class GenresRowMapper implements RowMapper<Void> {
             set.add(new Genre(genreId, null));
             genres.put(filmId, set);
         }
-        return null;
+        return genres;
     }
 }
