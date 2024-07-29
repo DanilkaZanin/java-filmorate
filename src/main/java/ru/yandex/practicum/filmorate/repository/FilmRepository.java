@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.repository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -15,6 +16,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.*;
 
+@Slf4j
 @Primary
 @RequiredArgsConstructor
 @Repository("filmRepository")
@@ -33,7 +35,7 @@ public class FilmRepository implements FilmStorage {
     private static final String GET_POPULAR_FILMS_QUERY = "SELECT films.* FROM films LEFT JOIN likes " +
             "ON films.id = likes.film_id GROUP BY films.id ORDER BY COUNT(likes.film_id) DESC LIMIT :limit";
     private static final String GET_FILM_BY_ID_QUERY = "SELECT * FROM films WHERE id = :id";
-    private static final String GET_GENRES_BU_ID =
+    private static final String GET_GENRES_BY_ID_QUERY =
             "SELECT g.id, g.name FROM films_genres fg LEFT JOIN genres g ON fg.genre_id = g.id WHERE film_id = :id";
     private static final String GET_GENRES_QUERY = "SELECT * FROM genres";
     private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE film_name = :film_name";
@@ -91,12 +93,12 @@ public class FilmRepository implements FilmStorage {
         try {
             SqlParameterSource parameterSource = new MapSqlParameterSource("id", id);
             Film film = jdbcTemplate.queryForObject(GET_FILM_BY_ID_QUERY, parameterSource, new FilmRowMapper());
-            List<Genre> genres = jdbcTemplate.query(GET_GENRES_BU_ID, parameterSource, new GenreRowMapper());
+            List<Genre> genres = jdbcTemplate.query(GET_GENRES_BY_ID_QUERY, parameterSource, new GenreRowMapper());
             film.setGenres(new LinkedHashSet<>(genres));
 
             return Optional.ofNullable(film);
-
         } catch (EmptyResultDataAccessException e) {
+            log.info("EmptyResultDataAccessException during query for film: {}", id);
             return Optional.empty();
         }
     }
@@ -125,7 +127,7 @@ public class FilmRepository implements FilmStorage {
         return films;
     }
 
-    private void putGenres(LinkedHashSet<Genre> genres, long id) {
+    private void putGenres(Set<Genre> genres, long id) {
         MapSqlParameterSource[] batchParams = genres.stream()
                 .map(genre -> {
                     MapSqlParameterSource p1 = new MapSqlParameterSource();
