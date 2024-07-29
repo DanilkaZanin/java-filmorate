@@ -25,11 +25,6 @@ public class FilmService {
     private final MpaStorage mpaRepository;
 
     public Film createFilm(Film film) {
-        if (filmRepository.getFilm(film.getId()).isPresent()) {
-            log.info("Film create failed: {}", film);
-            throw new IsAlreadyExistsException("Film with name " + film.getName() + " already exists");
-        }
-
         film = filmRepository.add(film);
 
         log.info("Film created: {}", film);
@@ -48,7 +43,7 @@ public class FilmService {
         return film;
     }
 
-    public Film setLike(long filmId, long userId) {
+    public void setLike(long filmId, long userId) {
         if (filmRepository.getFilm(filmId).isEmpty()) {
             throw new NotFoundException("Film with id " + filmId + " does not exist yet");
         }
@@ -58,10 +53,9 @@ public class FilmService {
 
         filmRepository.setLike(filmId, userId);
         log.info("Film was liked");
-        return null;
     }
 
-    public Film removeLike(long filmId, long userId) {
+    public void removeLike(long filmId, long userId) {
         if (filmRepository.getFilm(filmId).isEmpty()) {
             throw new NotFoundException("Film with id " + filmId + " does not exist yet");
         }
@@ -71,7 +65,6 @@ public class FilmService {
 
         filmRepository.removeLike(filmId, userId);
         log.info("Like was deleted");
-        return null;
     }
 
     public Film getFilm(long id) {

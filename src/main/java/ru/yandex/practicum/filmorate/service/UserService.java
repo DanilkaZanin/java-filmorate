@@ -17,10 +17,6 @@ public class UserService {
     private final UserStorage userStorage;
 
     public User createUser(final User user) {
-        if (userStorage.get(user.getId()).isPresent()) {
-            log.info("User creation failed {}", user.getId());
-            throw new NotFoundException("User with id " + user.getId() + " already exists");
-        }
         if (user.getName() == null || user.getName().trim().isEmpty()) {
             user.setName(user.getLogin());
         }
