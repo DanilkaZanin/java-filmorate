@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.validation.annotation.ReleaseDate;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Film.
@@ -37,12 +38,12 @@ public class Film {
     @Min(1)
     private int duration;
 
-    private LinkedHashSet<Long> likes = new LinkedHashSet<>();
+    private Set<Long> likes = new LinkedHashSet<>();
 
     @NotNull
     @Valid
     private Mpa mpa;
 
     @Valid
-    LinkedHashSet<Genre> genres = new LinkedHashSet<>();
+    Set<Genre> genres = new LinkedHashSet<>();
 }
