@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
 
@@ -16,8 +15,6 @@ import java.util.List;
 @Slf4j
 public class FilmController {
     private final FilmService filmService;
-
-    private final UserService userService;
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
@@ -31,18 +28,27 @@ public class FilmController {
 
     @GetMapping
     public List<Film> getAllFilms() {
-        return filmService.getAllFilms();
+        return filmService.getFilms();
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilm(@PathVariable("id") long id) {
+        return filmService.getFilm(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteFilm(@PathVariable long id) {
+        filmService.deleteFilm(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film like(@PathVariable int id, @PathVariable int userId) {
-        userService.doesUserExist(userId);
-        return filmService.setLike(id, userId);
+    public void like(@PathVariable int id, @PathVariable int userId) {
+        filmService.setLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film removeLike(@PathVariable int id, @PathVariable int userId) {
-        return filmService.removeLike(id, userId);
+    public void removeLike(@PathVariable int id, @PathVariable int userId) {
+        filmService.removeLike(id, userId);
     }
 
     @GetMapping("/popular")

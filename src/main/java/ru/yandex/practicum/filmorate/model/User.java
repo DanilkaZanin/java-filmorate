@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.validation.annotation.NoSpaceInLogin;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -34,13 +34,5 @@ public class User {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 
-    private Set<Long> friends = new HashSet<>();
-
-    public void putFriend(long friendId) {
-        friends.add(friendId);
-    }
-
-    public void deleteFriend(long friendId) {
-        friends.remove(friendId);
-    }
+    private Map<Long, FriendStatus> friends = new HashMap();
 }
